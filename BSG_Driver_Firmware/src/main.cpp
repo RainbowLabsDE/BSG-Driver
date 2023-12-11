@@ -4,7 +4,7 @@
 #include "util.h"
 #include "CanSender.hpp"
 
-CanSender canSender;
+CanSender canSender(CANSend);
 
 void setup() {
     Serial.begin(115200);
@@ -16,8 +16,10 @@ void setup() {
     
     delay(1000);
 
+    // printHex(canSender.m01F_Ctrl1._crcDataIdList, 16);
     canSender.m01F_Ctrl1.sRpmReq.setRaw(0x10);
-    printHex(canSender.m01F_Ctrl1._crcDataIdList, 16);
+    canSender.m01F_Ctrl1.sMode.setRaw(M01F_Ctrl1::Mode::RUN);
+    canSender.m020_Ignition.sStatus.setRaw(M020_Ignition::Status::ON);
 }
 
 uint8_t counter = 0;
@@ -25,24 +27,29 @@ uint8_t frameLength = 0;
 unsigned long previousMillis = 0; // stores last time output was updated
 const long interval = 1000;       // transmission interval (milliseconds)
 
+
+uint32_t prevDebug = 0;
+
 void loop() {
-    Serial.println(millis());
-    
-    printHex(canSender.m01F_Ctrl1.data(), 8);
-    
-    printf("Signals: %d\n", canSender.m01F_Ctrl1.signals.size());
-    for (auto &sig : canSender.m01F_Ctrl1.signals) {
-        if (sig->_name != nullptr) {
-            printf("- %s\n", sig->_name);
-        }
-        else {
-            printf("-\n");
+    if (millis() - prevDebug >= 500) {
+        prevDebug = millis();
+        digitalWrite(PC13, !digitalRead(PC13));
+        Serial.println(millis());
+        
+        printHex(canSender.m01F_Ctrl1.data(), 8);
+        
+        printf("Signals: %d\n", canSender.m01F_Ctrl1._signals.size());
+        for (auto &sig : canSender.m01F_Ctrl1._signals) {
+            if (sig->_name != nullptr) {
+                printf("- %s\n", sig->_name);
+            }
+            else {
+                printf("-\n");
+            }
         }
     }
 
-
-    digitalWrite(PC13, !digitalRead(PC13));
-    delay(500);
+    canSender.loop();
 }
 
 void loopCanDemo() {

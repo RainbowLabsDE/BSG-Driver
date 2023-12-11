@@ -12,17 +12,17 @@ class Message {
     uint8_t* data() { return this->_data; }
 
     void registerSignal(Signal* sig) {
-        signals.push_back(sig);
+        _signals.push_back(sig);
     }
 
-    std::vector<Signal*> signals;
+    std::vector<Signal*> _signals;
     const uint8_t _dataLength;
     const uint8_t _crcDataIdList[16] = {0};   // optional, used for CRC calculation 
     uint8_t _data[8];
 
-  protected:
     const uint32_t _id;
     const int _intervalTime;
     const bool _hasCrc;             // if true, calculate CRC and SEQ signals before sending
+    uint32_t _lastSentTime = 0;
 
 };

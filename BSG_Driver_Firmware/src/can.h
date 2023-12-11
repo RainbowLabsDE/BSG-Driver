@@ -1,5 +1,7 @@
 // CAN code from https://github.com/nopnop2002/Arduino-STM32-CAN
 
+#pragma once
+
 #include <stdint.h>
 
 /* Symbolic names for bit rate of CAN message                                */
