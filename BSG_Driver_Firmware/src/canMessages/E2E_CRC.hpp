@@ -9,12 +9,12 @@ class E2E_P02 {
     static void protect(Message* msg) {
         // for now, just assume CRC + SEQ are first elements in signal array.
         // increment sequence counter
-        uint8_t seq = (msg->signals[1].getRaw() + 1) % 16;
-        msg->signals[1].setRaw(seq);
+        uint8_t seq = (msg->signals[1]->getRaw() + 1) % 16;
+        msg->signals[1]->setRaw(seq);
 
-        uint8_t crc = calcCRC8H2F(msg->getData() + 1, msg->_dataLength, CRC8H2F_INITIAL_VALUE, true);
+        uint8_t crc = calcCRC8H2F(msg->data() + 1, msg->_dataLength, CRC8H2F_INITIAL_VALUE, true);
         crc = calcCRC8H2F(msg->_crcDataIdList + seq, 1, crc, false);
-        msg->signals[0].setRaw(crc);
+        msg->signals[0]->setRaw(crc);
     }
 
 
@@ -81,10 +81,10 @@ const uint8_t E2E_P02::CRC8H2F_TABLE[256] = {
 
 class SigCRC : public Signal {
     public:
-    SigCRC(uint8_t *msgData) : Signal(msgData, "CRC", 0, 8) {}
+    SigCRC(Message* msg) : Signal(msg, "CRC", 0, 8) {}
 };
 
 class SigSEQ : public Signal {
     public:
-    SigSEQ(uint8_t *msgData) : Signal(msgData, "SEQ", 8, 4) {}
+    SigSEQ(Message* msg) : Signal(msg, "SEQ", 8, 4) {}
 };

@@ -1,13 +1,23 @@
-#include "can.h"
 #include <Arduino.h>
+
+#include "can.h"
+#include "util.h"
+#include "CanSender.hpp"
+
+CanSender canSender;
 
 void setup() {
     Serial.begin(115200);
+    pinMode(PC13, OUTPUT);
     bool ret = CANInit(CAN_500KBPS, 2); // CAN_RX mapped to PB8, CAN_TX mapped to PB9
     if (!ret)
         while (true)
             ;
-            
+    
+    delay(1000);
+
+    canSender.m01F_Ctrl1.sRpmReq.setRaw(0x10);
+    printHex(canSender.m01F_Ctrl1._crcDataIdList, 16);
 }
 
 uint8_t counter = 0;
@@ -16,6 +26,26 @@ unsigned long previousMillis = 0; // stores last time output was updated
 const long interval = 1000;       // transmission interval (milliseconds)
 
 void loop() {
+    Serial.println(millis());
+    
+    printHex(canSender.m01F_Ctrl1.data(), 8);
+    
+    printf("Signals: %d\n", canSender.m01F_Ctrl1.signals.size());
+    for (auto &sig : canSender.m01F_Ctrl1.signals) {
+        if (sig->_name != nullptr) {
+            printf("- %s\n", sig->_name);
+        }
+        else {
+            printf("-\n");
+        }
+    }
+
+
+    digitalWrite(PC13, !digitalRead(PC13));
+    delay(500);
+}
+
+void loopCanDemo() {
     CAN_msg_t CAN_TX_msg;
     CAN_msg_t CAN_RX_msg;
 
