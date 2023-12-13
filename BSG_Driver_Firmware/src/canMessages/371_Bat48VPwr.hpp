@@ -14,5 +14,6 @@ class M371_Bat48VPwr : public Message {
     Signal sChgV = Signal(this, "Charge Voltage", 26, 16, 0.02, 0, 50.4, "V");
     Signal sMaxChgP = Signal(this, "Max. Charge Power", 42, 14, 20, 0, 20e3, "W");
 
-    const uint8_t _crcDataIdList[16] = { 114, 178, 242, 55, 119, 183, 247, 60, 124, 188, 252, 65, 129, 193, 6, 70 };
+    const uint8_t* dataIdList() { return _crcDataIdList; }
+    static inline constexpr const uint8_t _crcDataIdList[16] = { 114, 178, 242, 55, 119, 183, 247, 60, 124, 188, 252, 65, 129, 193, 6, 70 };
 };

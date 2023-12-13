@@ -6,6 +6,7 @@
 class M170_OBD1 : public Message {
     public:
     M170_OBD1() : Message(0x170, 8, 100, false) {}
+    const uint8_t* dataIdList() { return nullptr; }
 
     // Signals automatically register themselves in the "_signals" vector.
     Signal sLoad = Signal(this, "Engine Load", 40, 8);

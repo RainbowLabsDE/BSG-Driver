@@ -15,7 +15,8 @@ class M0AE_Transm : public Message {
     Signal sGearTarget = Signal(this, "Gear Target", 51, 4); // ?
     Signal sTrqReq = Signal(this, "Torque Request", 56, 8); //?
 
-    const uint8_t _crcDataIdList[16] = { 54, 199, 93, 238, 132, 26, 171, 65, 210, 104, 249, 143, 37, 182, 76, 221 };
+    const uint8_t* dataIdList() { return _crcDataIdList; }
+    static inline constexpr const uint8_t _crcDataIdList[16] = { 54, 199, 93, 238, 132, 26, 171, 65, 210, 104, 249, 143, 37, 182, 76, 221 };
 
     enum Gear {
         N, 

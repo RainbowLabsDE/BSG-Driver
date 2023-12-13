@@ -6,6 +6,7 @@
 class M36F_Bat48VLim : public Message {
     public:
     M36F_Bat48VLim() : Message(0x36F, 8, 20, false) {}
+    const uint8_t* dataIdList() { return nullptr; }
 
     // Signals automatically register themselves in the "_signals" vector.
     Signal sUnk1 = Signal(this, (uint8_t)0, 8, 244);

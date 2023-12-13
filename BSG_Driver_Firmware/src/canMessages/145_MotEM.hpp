@@ -13,7 +13,8 @@ class M145_MotEM : public Message {
     Signal sUnk1 = Signal(this, 16, 13, 2000);
     Signal sUnk2 = Signal(this, 48, 13, 2000);
 
-    const uint8_t _crcDataIdList[16] = { 171, 219, 16, 64, 112, 160, 208, 5, 53, 101, 149, 197, 245, 42, 90, 138 };
+    const uint8_t* dataIdList() { return _crcDataIdList; }
+    static inline constexpr const uint8_t _crcDataIdList[16] = { 171, 219, 16, 64, 112, 160, 208, 5, 53, 101, 149, 197, 245, 42, 90, 138 };
 
 
 };

@@ -12,8 +12,8 @@ class E2E_P02 {
         uint8_t seq = (msg->_signals[1]->getRaw() + 1) % 16;
         msg->_signals[1]->setRaw(seq);
 
-        uint8_t crc = calcCRC8H2F(msg->data() + 1, msg->_dataLength, CRC8H2F_INITIAL_VALUE, true);
-        crc = calcCRC8H2F(msg->_crcDataIdList + seq, 1, crc, false);
+        uint8_t crc = calcCRC8H2F(msg->data() + 1, msg->_dataLength - 1, CRC8H2F_INITIAL_VALUE, true);
+        crc = calcCRC8H2F(msg->dataIdList() + seq, 1, crc, false);
         msg->_signals[0]->setRaw(crc);
     }
 

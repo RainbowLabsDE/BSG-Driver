@@ -6,6 +6,7 @@
 class M309_Info : public Message {
     public:
     M309_Info() : Message(0x309, 8, 1000, false) {}
+    const uint8_t* dataIdList() { return nullptr; }
 
     // Signals automatically register themselves in the "_signals" vector.
     Signal sOdo = Signal(this, "Odometer", 0, 24, 0.1, 0.0, 0.0, "km");

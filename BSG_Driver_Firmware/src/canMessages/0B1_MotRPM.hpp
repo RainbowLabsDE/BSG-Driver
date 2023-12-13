@@ -14,7 +14,8 @@ class M0B1_MotRPM : public Message {
     Signal sUnk1 = Signal(this, 40, 13, 2000);
     Signal sUnk2 = Signal(this, 56, 8, 0x37);
 
-    const uint8_t _crcDataIdList[16] = { 199, 227, 4, 32, 60, 88, 116, 144, 172, 200, 228, 5, 33, 61, 89, 117 };
+    const uint8_t* dataIdList() { return _crcDataIdList; }
+    static inline constexpr const uint8_t _crcDataIdList[16] = { 199, 227, 4, 32, 60, 88, 116, 144, 172, 200, 228, 5, 33, 61, 89, 117 };
 
     enum Status {
         STOP,

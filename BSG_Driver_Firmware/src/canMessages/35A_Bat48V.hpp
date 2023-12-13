@@ -6,6 +6,7 @@
 class M35A_Bat48V : public Message {
     public:
     M35A_Bat48V() : Message(0x35A, 8, 100, false) {}
+    const uint8_t* dataIdList() { return nullptr; }
 
     // Signals automatically register themselves in the "_signals" vector.
     Signal sVoltage = Signal(this, "Voltage", 0, 10, 0.1, 0, 48.0, "V");

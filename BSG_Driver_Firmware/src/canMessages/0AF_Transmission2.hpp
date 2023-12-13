@@ -12,5 +12,6 @@ class M0AF_Transm2 : public Message {
     SigSEQ sSEQ = SigSEQ(this);
     Signal sUnk1 = Signal(this, 37, 1, 1);
 
-    const uint8_t _crcDataIdList[16] = { 246, 18, 41, 64, 87, 110, 133, 156, 179, 202, 225, 248, 20, 43, 66, 89 };
+    const uint8_t* dataIdList() { return _crcDataIdList; }
+    static inline constexpr const uint8_t _crcDataIdList[16] = { 246, 18, 41, 64, 87, 110, 133, 156, 179, 202, 225, 248, 20, 43, 66, 89 };
 };

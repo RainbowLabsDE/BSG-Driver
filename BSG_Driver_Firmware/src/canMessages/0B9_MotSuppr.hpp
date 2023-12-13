@@ -14,7 +14,8 @@ class M0B9_MotSuppr : public Message {
     Signal sUnk1 = Signal(this, 16, 13, 2000);
     Signal sUnk2 = Signal(this, 56, 7, 50);
 
-    const uint8_t _crcDataIdList[16] = { 17, 14, 11, 8, 5, 253, 250, 247, 244, 241, 238, 235, 232, 229, 226, 223 };
+    const uint8_t* dataIdList() { return _crcDataIdList; }
+    static inline constexpr const uint8_t _crcDataIdList[16] = { 17, 14, 11, 8, 5, 253, 250, 247, 244, 241, 238, 235, 232, 229, 226, 223 };
 
     enum Status {
         STOP,

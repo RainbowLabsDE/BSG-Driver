@@ -9,6 +9,7 @@ class Message {
     Message(uint32_t id, uint8_t dataLength, int intervalTime = 0, bool hasCrc = false);
 
     uint8_t* data() { return this->_data; }
+    virtual const uint8_t* dataIdList() = 0;
 
     void registerSignal(Signal* sig) {
         _signals.push_back(sig);
@@ -16,7 +17,6 @@ class Message {
 
     std::vector<Signal*> _signals;
     const uint8_t _dataLength;
-    const uint8_t _crcDataIdList[16] = {0};   // optional, used for CRC calculation 
     uint8_t _data[8] = {0};
 
     const uint32_t _id;

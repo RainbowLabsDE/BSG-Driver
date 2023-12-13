@@ -6,6 +6,7 @@
 class M2D3_Bat12V : public Message {
     public:
     M2D3_Bat12V() : Message(0x2D3, 8, 100, false) {}
+    const uint8_t* dataIdList() { return nullptr; }
 
     // Signals automatically register themselves in the "_signals" vector.
     Signal sVoltage = Signal(this, "Voltage", 0, 8, 0.1, 0.0, 12.0, "V");
