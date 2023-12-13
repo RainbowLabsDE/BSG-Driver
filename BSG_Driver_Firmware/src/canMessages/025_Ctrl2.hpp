@@ -10,7 +10,7 @@ class M025_Ctrl2 : public Message {
     // Signals automatically register themselves in the "_signals" vector.
     SigCRC sCRC = SigCRC(this);
     SigSEQ sSEQ = SigSEQ(this);
-    Signal sMode = Signal(this, "Mode", 12, 4);
+    Signal sMode = Signal(this, "Mode", 12, 4, 1.0, 0.0, Mode::RUN);
     Signal sUnk1 = Signal(this, 16, 15, 16384);
     Signal sUnk2 = Signal(this, 32, 13, 4096);
 

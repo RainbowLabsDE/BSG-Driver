@@ -5,8 +5,9 @@
 #include "Message.hpp"
 #include <string.h>
 
-Signal::Signal(Message* msg, const char *name, uint8_t startBit, uint8_t length, float factor, float offset, const char *unit)
+Signal::Signal(Message* msg, const char *name, uint8_t startBit, uint8_t length, float factor, float offset, float init, const char *unit)
     : _msg(msg), _name(name), _startBit(startBit), _length(length), _factor(factor), _offset(offset), _unit(unit) {
+    setVal(init);
     _msg->registerSignal(this); // register myself in message (as to avoid duplicate code while defining signals in Message)
 }
 
@@ -36,3 +37,13 @@ void Signal::setRaw(uint64_t val) {
     //     uint8_t bitPos = _startBit * 8;
     // }
 };  
+
+float Signal::getVal() {
+    float val = (getRaw() * _factor) + _offset;
+    return val;
+}
+
+void Signal::setVal(float val) {
+    uint64_t raw = (val - _offset) / _factor;
+    setRaw(raw);
+}

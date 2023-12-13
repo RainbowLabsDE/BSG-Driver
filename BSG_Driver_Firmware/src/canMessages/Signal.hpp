@@ -6,13 +6,15 @@ class Message;  // forward declaration
 
 class Signal {
   public:
-    Signal(Message* msg, const char *name, uint8_t startBit, uint8_t length, float factor = 1, float offset = 0, const char *unit = nullptr);
+    Signal(Message* msg, const char *name, uint8_t startBit, uint8_t length, float factor = 1.0, float offset = 0.0, float init = 0.0, const char *unit = nullptr);
 
     // Unknown signal
     Signal(Message* msg, uint8_t startBit, uint8_t length, uint64_t unknownData);
 
     uint64_t getRaw();
     void setRaw(uint64_t val);  
+    float getVal();
+    void setVal(float val);
 
     const char* _name;
     const uint8_t _startBit;

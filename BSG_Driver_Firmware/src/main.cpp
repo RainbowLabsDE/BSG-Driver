@@ -20,6 +20,7 @@ void setup() {
     canSender.m01F_Ctrl1.sRpmReq.setRaw(0x10);
     canSender.m01F_Ctrl1.sMode.setRaw(M01F_Ctrl1::Mode::RUN);
     canSender.m020_Ignition.sStatus.setRaw(M020_Ignition::Status::ON);
+    printf("Msgs: %d\n", canSender._messages.size());
 }
 
 uint8_t counter = 0;
