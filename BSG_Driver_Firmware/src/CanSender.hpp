@@ -26,6 +26,7 @@
 #include "canMessages/3CC_LowCool1.hpp"
 #include "canMessages/3F2_LowCool2.hpp"
 #include "canMessages/443_Bat48VRes.hpp"
+#include "canMessages/4C0_Timeouts.hpp"
 
 class CanSender {
     public:
@@ -42,7 +43,7 @@ class CanSender {
 
         CAN_msg_t canMsg = {
             .id = msg->_id,
-            .len = msg->_dataLength,
+            .len = 8, // msg->_dataLength, // use dataLength only for CRC calculation for now and always send 8 Bytes
             .format = STANDARD_FORMAT,
             .type = DATA_FRAME,
         };
@@ -90,4 +91,5 @@ class CanSender {
     M3CC_LowCool1 m3CC_LowCool1;
     M3F2_LowCool2 m3F2_LowCool2;
     M443_Bat48VRes m443_Bat48VRes;
+    M4C0_Timeouts m4C0_Timeouts;
 };

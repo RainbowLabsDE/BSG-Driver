@@ -5,7 +5,7 @@
 
 class M020_Ignition : public Message {
     public:
-    M020_Ignition() : Message(0x020, 8, 100, true) {}
+    M020_Ignition() : Message(0x020, 4, 100, true) {}
 
     // Signals automatically register themselves in the "_signals" vector.
     SigCRC sCRC = SigCRC(this);

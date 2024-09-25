@@ -5,7 +5,7 @@
 
 class M443_Bat48VRes : public Message {
     public:
-    M443_Bat48VRes() : Message(0x443, 8, 0, false) {}
+    M443_Bat48VRes() : Message(0x443, 8, 1000, false) {}
     const uint8_t* dataIdList() { return nullptr; }
 
     // Signals automatically register themselves in the "_signals" vector.
