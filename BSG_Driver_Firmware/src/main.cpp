@@ -19,6 +19,7 @@ void setup() {
     // printHex(canSender.m01F_Ctrl1._crcDataIdList, 16);
     canSender.m01F_Ctrl1.sRpmReq.setRaw(0x10);
     canSender.m01F_Ctrl1.sMode.setRaw(M01F_Ctrl1::Mode::RUN);
+    canSender.m01F_Ctrl1.sTrqMaxRq.setVal(1);
     canSender.m020_Ignition.sStatus.setRaw(M020_Ignition::Status::ON);
     canSender.m020_Ignition.sStatus2.setRaw(1);
     canSender.m020_Ignition.sStatus3.setRaw(1);
