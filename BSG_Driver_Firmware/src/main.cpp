@@ -6,6 +6,23 @@
 
 CanSender canSender(CANSend);
 
+
+static const uint CAN_ID_XCP_REQ = 0x18EF6201;
+static const uint CAN_ID_XCP_RESP = 0x18EF6202;
+
+
+// TODO: move somewhere better
+void handleMsg(CAN_msg_t& msg) {
+    switch (msg.id) {
+        case CAN_ID_XCP_RESP:
+            // TODO
+            break;
+        default:
+            bool knownMsg = canSender.handleMsg(msg);
+            break;
+    }
+}
+
 void setup() {
     Serial.begin(115200);
     pinMode(PC13, OUTPUT);
@@ -17,10 +34,10 @@ void setup() {
     delay(1000);
 
     // printHex(canSender.m01F_Ctrl1._crcDataIdList, 16);
-    canSender.m01F_Ctrl1.sMode.setRaw(M01F_Ctrl1::Mode::TRQ);
+    canSender.m01F_Ctrl1.sMode.setRaw(M01F_Ctrl1::Mode::RPM);
     canSender.m01F_Ctrl1.sTrqMinRq.setVal(0);
-    canSender.m01F_Ctrl1.sTrqMaxRq.setVal(1);
-    canSender.m01F_Ctrl1.sRpmReq.setVal(0); // 500 RPM == 1460 RPM
+    canSender.m01F_Ctrl1.sTrqMaxRq.setVal(20);
+    canSender.m01F_Ctrl1.sRpmReq.setVal(2); // 500 RPM == 1460 RPM
     canSender.m020_Ignition.sStatus.setRaw(M020_Ignition::Status::ON);
     canSender.m0B1_MotRPM.sStatus.setRaw(M0B1_MotRPM::Status::RUN);
     // printf("Msgs: %d\n", canSender._messages.size());
@@ -51,6 +68,7 @@ void loop() {
         prevDebug = millis();
         digitalWrite(PC13, !digitalRead(PC13));
         Serial.println(millis());
+        printf("[01E] RPM: %5.0f\n", canSender.m01E_Status.sRPM.getVal());
         
         // printHex(canSender.m01F_Ctrl1.data(), 8);
         
@@ -66,88 +84,10 @@ void loop() {
     }
 
     canSender.loop();   
+
+    if (CANMsgAvail()) {
+        CAN_msg_t msg = {0};
+        CANReceive(&msg);
+        handleMsg(msg);
+    }
 }
-
-// void loopCanDemo() {
-//     CAN_msg_t CAN_TX_msg;
-//     CAN_msg_t CAN_RX_msg;
-
-//     CAN_TX_msg.data[0] = 0x00;
-//     CAN_TX_msg.data[1] = 0x01;
-//     CAN_TX_msg.data[2] = 0x02;
-//     CAN_TX_msg.data[3] = 0x03;
-//     CAN_TX_msg.data[4] = 0x04;
-//     CAN_TX_msg.data[5] = 0x05;
-//     CAN_TX_msg.data[6] = 0x06;
-//     CAN_TX_msg.data[7] = 0x07;
-//     CAN_TX_msg.len = frameLength;
-
-//     unsigned long currentMillis = millis();
-//     if (currentMillis - previousMillis >= interval) {
-//         previousMillis = currentMillis;
-//         if ((counter % 2) == 0) {
-//             CAN_TX_msg.type = DATA_FRAME;
-//             if (CAN_TX_msg.len == 0)
-//                 CAN_TX_msg.type = REMOTE_FRAME;
-//             CAN_TX_msg.format = EXTENDED_FORMAT;
-//             CAN_TX_msg.id = 0x32F072;
-//         } else {
-//             CAN_TX_msg.type = DATA_FRAME;
-//             if (CAN_TX_msg.len == 0)
-//                 CAN_TX_msg.type = REMOTE_FRAME;
-//             CAN_TX_msg.format = STANDARD_FORMAT;
-//             CAN_TX_msg.id = 0x072;
-//         }
-//         CANSend(&CAN_TX_msg);
-//         frameLength++;
-//         if (frameLength == 9)
-//             frameLength = 0;
-//         counter++;
-//     }
-
-//     if (CANMsgAvail()) {
-//         CANReceive(&CAN_RX_msg);
-
-//         if (CAN_RX_msg.format == EXTENDED_FORMAT) {
-//             Serial.print("Extended ID: 0x");
-//             if (CAN_RX_msg.id < 0x10000000)
-//                 Serial.print("0");
-//             if (CAN_RX_msg.id < 0x1000000)
-//                 Serial.print("0");
-//             if (CAN_RX_msg.id < 0x100000)
-//                 Serial.print("0");
-//             if (CAN_RX_msg.id < 0x10000)
-//                 Serial.print("0");
-//             if (CAN_RX_msg.id < 0x1000)
-//                 Serial.print("0");
-//             if (CAN_RX_msg.id < 0x100)
-//                 Serial.print("0");
-//             if (CAN_RX_msg.id < 0x10)
-//                 Serial.print("0");
-//             Serial.print(CAN_RX_msg.id, HEX);
-//         } else {
-//             Serial.print("Standard ID: 0x");
-//             if (CAN_RX_msg.id < 0x100)
-//                 Serial.print("0");
-//             if (CAN_RX_msg.id < 0x10)
-//                 Serial.print("0");
-//             Serial.print(CAN_RX_msg.id, HEX);
-//             Serial.print("     ");
-//         }
-
-//         Serial.print(" DLC: ");
-//         Serial.print(CAN_RX_msg.len);
-//         if (CAN_RX_msg.type == DATA_FRAME) {
-//             Serial.print(" Data: ");
-//             for (int i = 0; i < CAN_RX_msg.len; i++) {
-//                 Serial.print("0x");
-//                 Serial.print(CAN_RX_msg.data[i], HEX);
-//                 if (i != (CAN_RX_msg.len - 1))
-//                     Serial.print(" ");
-//             }
-//             Serial.println();
-//         } else {
-//             Serial.println(" Data: REMOTE REQUEST FRAME");
-//         }
-//     }
-// }

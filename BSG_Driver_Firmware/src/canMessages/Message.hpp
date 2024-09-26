@@ -6,7 +6,7 @@
 
 class Message {
     public:
-    Message(uint32_t id, uint8_t dataLength, int intervalTime = 0, bool hasCrc = false);
+    Message(uint32_t id, uint8_t dataLength, int intervalTime = 0, bool hasCrc = false, bool isRxMsg = false);
 
     uint8_t* data() { return this->_data; }
     virtual const uint8_t* dataIdList() = 0;

@@ -27,6 +27,7 @@
 #include "canMessages/3F2_LowCool2.hpp"
 #include "canMessages/443_Bat48VRes.hpp"
 #include "canMessages/4C0_Timeouts.hpp"
+#include "canMessages/rx/01E_Status.hpp"
 
 class CanSender {
     public:
@@ -52,6 +53,18 @@ class CanSender {
         _canTx(&canMsg);
     }
 
+    bool handleMsg(CAN_msg_t& inMsg) {
+        for (auto &msg : _rxMessages) {
+            if (msg->_id == inMsg.id) {
+                msg->_lastSentTime = millis();  // also last received time until refactored
+                memcpy(msg->data(), inMsg.data, inMsg.len);
+                // TODO: check CRC here?
+                return true;
+            }
+        }
+        return false;   // message with given ID not registered
+    }
+
     void loop() {
         for (auto &msg : _messages) {
             if (msg->_intervalTime != 0 && millis() - msg->_lastSentTime >= msg->_intervalTime) {
@@ -66,7 +79,12 @@ class CanSender {
         _messages.push_back(msg);
     }
 
+    void registerRxMessage(Message* msg) {
+        _rxMessages.push_back(msg);
+    }
+
     std::vector<Message*> _messages;    // Messages should register themselves
+    std::vector<Message*> _rxMessages;
     void (*_canTx)(CAN_msg_t*);
 
     M01F_Ctrl1 m01F_Ctrl1;
@@ -92,4 +110,7 @@ class CanSender {
     M3F2_LowCool2 m3F2_LowCool2;
     M443_Bat48VRes m443_Bat48VRes;
     M4C0_Timeouts m4C0_Timeouts;
+
+    // Incoming messages
+    M01E_Status m01E_Status;
 };
