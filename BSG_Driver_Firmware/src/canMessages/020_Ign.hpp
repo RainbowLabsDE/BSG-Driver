@@ -11,9 +11,6 @@ class M020_Ignition : public Message {
     SigCRC sCRC = SigCRC(this);
     SigSEQ sSEQ = SigSEQ(this);
     Signal sStatus = Signal(this, "Status", 12, 3);
-    Signal sStatus2 = Signal(this, "Status2", 15, 1);
-    Signal sStatus3 = Signal(this, "Status3", 16, 1);
-    Signal sUnk1 = Signal(this, 28, 1, 1);
 
     const uint8_t* dataIdList() { return _crcDataIdList; }
     static inline constexpr const uint8_t _crcDataIdList[16] = { 167, 211, 4, 48, 92, 136, 180, 224, 17, 61, 105, 149, 193, 237, 30, 74 };

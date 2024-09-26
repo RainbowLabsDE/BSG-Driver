@@ -3,6 +3,8 @@
 #include "Message.hpp"
 #include "E2E_CRC.hpp"
 
+// This message isn't needed apparently?
+
 class M025_Ctrl2 : public Message {
     public:
     M025_Ctrl2() : Message(0x025, 8, 10, true) {}

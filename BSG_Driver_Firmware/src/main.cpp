@@ -17,16 +17,12 @@ void setup() {
     delay(1000);
 
     // printHex(canSender.m01F_Ctrl1._crcDataIdList, 16);
-    canSender.m01F_Ctrl1.sRpmReq.setRaw(0x10);
-    canSender.m01F_Ctrl1.sMode.setRaw(M01F_Ctrl1::Mode::RUN);
+    canSender.m01F_Ctrl1.sMode.setRaw(M01F_Ctrl1::Mode::TRQ);
+    canSender.m01F_Ctrl1.sTrqMinRq.setVal(0);
     canSender.m01F_Ctrl1.sTrqMaxRq.setVal(1);
+    canSender.m01F_Ctrl1.sRpmReq.setVal(0); // 500 RPM == 1460 RPM
     canSender.m020_Ignition.sStatus.setRaw(M020_Ignition::Status::ON);
-    canSender.m020_Ignition.sStatus2.setRaw(1);
-    canSender.m020_Ignition.sStatus3.setRaw(1);
     canSender.m0B1_MotRPM.sStatus.setRaw(M0B1_MotRPM::Status::RUN);
-    canSender.m0AE_Transmission.sGear.setRaw(M0AE_Transm::Gear::D1);
-    canSender.m0AE_Transmission.sGearTarget.setRaw(M0AE_Transm::Gear::D1);
-    canSender.m0AE_Transmission.sLever.setRaw(M0AE_Transm::Lever::L_D);
     // printf("Msgs: %d\n", canSender._messages.size());
 
     // CAN_msg_t vinMsg = {.id = 0x071, .data = {0}, .len = 8};

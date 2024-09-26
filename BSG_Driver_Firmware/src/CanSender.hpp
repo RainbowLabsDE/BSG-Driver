@@ -71,7 +71,7 @@ class CanSender {
 
     M01F_Ctrl1 m01F_Ctrl1;
     M020_Ignition m020_Ignition;
-    M025_Ctrl2 m025_Ctrl2;
+    // M025_Ctrl2 m025_Ctrl2;
     M081_MotorFoo m081_MotorFoo;
     M099_Power m099_Power;
     M0AE_Transm m0AE_Transmission;
