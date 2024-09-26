@@ -65,6 +65,12 @@ class CanSender {
         return false;   // message with given ID not registered
     }
 
+    void printRxMsgs() {
+        for (auto &msg : _rxMessages) {
+            msg->printSignals();
+        }
+    }
+
     void loop() {
         for (auto &msg : _messages) {
             if (msg->_intervalTime != 0 && millis() - msg->_lastSentTime >= msg->_intervalTime) {

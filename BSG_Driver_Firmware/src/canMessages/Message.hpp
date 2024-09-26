@@ -15,6 +15,8 @@ class Message {
         _signals.push_back(sig);
     }
 
+    void printSignals();
+
     std::vector<Signal*> _signals;
     const uint8_t _dataLength;
     uint8_t _data[8] = {0};

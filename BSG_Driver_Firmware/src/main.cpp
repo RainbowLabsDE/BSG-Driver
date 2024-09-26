@@ -68,7 +68,9 @@ void loop() {
         prevDebug = millis();
         digitalWrite(PC13, !digitalRead(PC13));
         Serial.println(millis());
-        printf("[01E] RPM: %5.0f\n", canSender.m01E_Status.sRPM.getVal());
+        // printf("[01E] RPM: %5.0f\n", canSender.m01E_Status.sRPM.getVal());
+        // canSender.m01E_Status.printSignals();
+        canSender.printRxMsgs();
         
         // printHex(canSender.m01F_Ctrl1.data(), 8);
         
