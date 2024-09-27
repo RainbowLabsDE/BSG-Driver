@@ -28,7 +28,7 @@ uint64_t Signal::getRaw() {
 void Signal::setRaw(uint64_t val) {
     uint64_t tmp;
     memcpy(&tmp, _msg->data(), sizeof(tmp));
-    uint64_t mask = ((1 << _length) - 1) << _startBit;
+    uint64_t mask = ((1ULL << _length) - 1) << _startBit;
     tmp &= ~mask;
     tmp |= val << _startBit;
     memcpy(_msg->data(), &tmp, sizeof(tmp));
