@@ -35,4 +35,23 @@ class M01F_Ctrl1 : public Message {
         TRQ = 1,
         RPM = 5,
     };
+
+    static inline const char *ModeStr[] = {
+        "IDLE",
+        "TRQ",
+        "2",
+        "3",
+        "4",
+        "RPM",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+    };
 };

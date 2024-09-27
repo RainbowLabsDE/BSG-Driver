@@ -3,12 +3,10 @@
 #include "can.h"
 #include "util.h"
 #include "CanSender.hpp"
+#include "xcp.hpp"
 
 CanSender canSender(CANSend);
-
-
-static const uint CAN_ID_XCP_REQ = 0x18EF6201;
-static const uint CAN_ID_XCP_RESP = 0x18EF6202;
+bool started = false;
 
 
 // TODO: move somewhere better
@@ -23,6 +21,18 @@ void handleMsg(CAN_msg_t& msg) {
     }
 }
 
+void initBSG() {
+    // TODO: send XCP
+    xcp.deactivateFBS4();
+
+    delay(10);
+
+    canSender.m01F_Ctrl1.sMode.setRaw(M01F_Ctrl1::Mode::IDLE);
+    canSender.m020_Ignition.sStatus.setRaw(M020_Ignition::Status::ON);
+    canSender.m0B1_MotRPM.sStatus.setRaw(M0B1_MotRPM::Status::RUN);
+    
+}
+
 void setup() {
     Serial.begin(115200);
     pinMode(PC13, OUTPUT);
@@ -33,26 +43,7 @@ void setup() {
     
     delay(1000);
 
-    // printHex(canSender.m01F_Ctrl1._crcDataIdList, 16);
-    canSender.m01F_Ctrl1.sMode.setRaw(M01F_Ctrl1::Mode::RPM);
-    canSender.m01F_Ctrl1.sTrqMinRq.setVal(0);
-    canSender.m01F_Ctrl1.sTrqMaxRq.setVal(20);
-    canSender.m01F_Ctrl1.sRpmReq.setVal(2); // 500 RPM == 1460 RPM
-    canSender.m020_Ignition.sStatus.setRaw(M020_Ignition::Status::ON);
-    canSender.m0B1_MotRPM.sStatus.setRaw(M0B1_MotRPM::Status::RUN);
-    // printf("Msgs: %d\n", canSender._messages.size());
-
-    // CAN_msg_t vinMsg = {.id = 0x071, .data = {0}, .len = 8};
-    // CANSend(&vinMsg);
-    // vinMsg.data[0]++;
-    // CANSend(&vinMsg);
-    // vinMsg.data[0]++;
-    // CANSend(&vinMsg);
-
-    // CAN_msg_t fbsMsg = {.id = 0x235, .data = {0}, .len = 8};
-    // memset(fbsMsg.data, 0xFF, 8);
-    // CANSend(&fbsMsg);
-    
+   
 }
 
 uint8_t counter = 0;
@@ -63,26 +54,13 @@ const long interval = 1000;       // transmission interval (milliseconds)
 
 uint32_t prevDebug = 0;
 
+int rpmRq = 0;
+float trqMinRq = 0, trqMaxRq = 0;
+
 void loop() {
-    if (millis() - prevDebug >= 500) {
-        prevDebug = millis();
-        digitalWrite(PC13, !digitalRead(PC13));
-        Serial.println(millis());
-        // printf("[01E] RPM: %5.0f\n", canSender.m01E_Status.sRPM.getVal());
-        // canSender.m01E_Status.printSignals();
-        canSender.printRxMsgs();
-        
-        // printHex(canSender.m01F_Ctrl1.data(), 8);
-        
-        // printf("Signals: %d\n", canSender.m01F_Ctrl1._signals.size());
-        // for (auto &sig : canSender.m01F_Ctrl1._signals) {
-        //     if (sig->_name != nullptr) {
-        //         printf("- %s\n", sig->_name);
-        //     }
-        //     else {
-        //         printf("-\n");
-        //     }
-        // }
+    if (!started && millis() > 3000) {
+        initBSG();
+        started = true;
     }
 
     canSender.loop();   
@@ -92,4 +70,66 @@ void loop() {
         CANReceive(&msg);
         handleMsg(msg);
     }
+
+    while (Serial.available()) {
+        // printf(" %02X ", Serial.read());
+        char c = Serial.read();
+        switch (c) {
+            case 'i':
+                canSender.m01F_Ctrl1.sMode.setRaw(M01F_Ctrl1::Mode::IDLE);
+                // canSender.m020_Ignition.sStatus.setRaw(M020_Ignition::Status::ON);
+                break;
+            case 't':
+                canSender.m01F_Ctrl1.sMode.setRaw(M01F_Ctrl1::Mode::TRQ);
+                break;
+            case 'r':
+                canSender.m01F_Ctrl1.sMode.setRaw(M01F_Ctrl1::Mode::RPM);
+                break;
+            case 'q':   rpmRq += 2;         break;
+            case 'Q':   rpmRq += 20;        break;
+            case 'a':   rpmRq -= 2;         break;
+            case 'A':   rpmRq -= 20;        break;
+            case 'w':   trqMinRq += 0.5;    break;
+            case 'W':   trqMinRq += 5;      break;
+            case 's':   trqMinRq -= 0.5;    break;
+            case 'S':   trqMinRq -= 5;      break;
+            case 'e':   trqMaxRq += 0.5;    break;
+            case 'E':   trqMaxRq += 5;      break;
+            case 'd':   trqMaxRq -= 0.5;    break;
+            case 'D':   trqMaxRq -= 5;      break;
+            case ' ':
+            case '\n':
+            case '\r':
+                rpmRq = 0;
+                trqMinRq = 0;
+                trqMaxRq = 0;
+                canSender.m01F_Ctrl1.sMode.setRaw(M01F_Ctrl1::Mode::IDLE);
+            break;
+        }
+        if (c >= '1' && c <= '9') {
+            canSender.m01F_Ctrl1.sMode.setRaw(c - '0');
+        }
+
+        if (rpmRq < 0) rpmRq = 0;
+        canSender.m01F_Ctrl1.sRpmReq.setVal(rpmRq); 
+
+        canSender.m01F_Ctrl1.sTrqMinRq.setVal(trqMinRq);
+        canSender.m01F_Ctrl1.sTrqMaxRq.setVal(trqMaxRq);
+    }
+
+    if (millis() - prevDebug >= 500) {
+        prevDebug = millis();
+        digitalWrite(PC13, !digitalRead(PC13));
+
+        Serial.println();
+        Serial.println(millis());
+        canSender.printRxMsgs();
+        printf("REQUEST: Mode: %5s, RPM: %4g, TRQ_min: %5.1f, TRQ_max: %5.1f\n", 
+            M01F_Ctrl1::ModeStr[canSender.m01F_Ctrl1.sMode.getRaw()], 
+            canSender.m01F_Ctrl1.sRpmReq.getVal(),
+            canSender.m01F_Ctrl1.sTrqMinRq.getVal(),
+            canSender.m01F_Ctrl1.sTrqMaxRq.getVal()
+            );
+    }
+
 }
