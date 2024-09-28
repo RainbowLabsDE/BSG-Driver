@@ -29,6 +29,7 @@
 #include "canMessages/4C0_Timeouts.hpp"
 #include "canMessages/rx/01E_Status.hpp"
 #include "canMessages/rx/047_Status3.hpp"
+#include "canMessages/rx/190_Status2.hpp"
 #include "canMessages/rx/436_Status5.hpp"
 
 class CanSender {
@@ -121,6 +122,7 @@ class CanSender {
 
     // Incoming messages
     M01E_Status m01E_Status;
-    M047_Status3 m047_Status2;
+    M047_Status3 m047_Status3;
+    M190_Status2 m190_Status2;
     M436_Status5 m436_Status5;
 };
