@@ -26,6 +26,13 @@ class Signal {
     // float max;
     // const char* comment;
 
+    
+    // stuff needed for more elegant printing of values
+    const int _numDigits = 0;
+    const int _numDecimals = 0;
+    constexpr int calcNum(uint8_t length, float factor, float offset, bool digitOrDecimal) const;
+
+
   protected:
     Message* _msg;
 };

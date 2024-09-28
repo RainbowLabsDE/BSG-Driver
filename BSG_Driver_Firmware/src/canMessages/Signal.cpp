@@ -4,9 +4,11 @@
 #include "Signal.hpp"
 #include "Message.hpp"
 #include <string.h>
+#include <math.h>
 
 Signal::Signal(Message* msg, const char *name, uint8_t startBit, uint8_t length, float factor, float offset, float init, const char *unit)
-    : _msg(msg), _name(name), _startBit(startBit), _length(length), _factor(factor), _offset(offset), _unit(unit) {
+    : _msg(msg), _name(name), _startBit(startBit), _length(length), _factor(factor), _offset(offset), _unit(unit),
+      _numDigits(calcNum(length, factor, offset, false)), _numDecimals(calcNum(length, factor, offset, true)) {
     setVal(init);
     _msg->registerSignal(this); // register myself in message (as to avoid duplicate code while defining signals in Message)
 }
@@ -46,4 +48,42 @@ float Signal::getVal() {
 void Signal::setVal(float val) {
     uint64_t raw = (val - _offset) / _factor;
     setRaw(raw);
+}
+
+constexpr int Signal::calcNum(uint8_t length, float factor, float offset, bool digitOrDecimal) const {
+    int decimals = 0;
+    if (factor < 0.01) {
+        decimals = 3;
+    }
+    else if (factor < 0.1 || factor == 0.25) {
+        decimals = 2;
+    }
+    else if (factor < 1) {
+        decimals = 1;
+    }
+    uint64_t maxRaw = (1ULL << length) - 1;
+    float maxVal = maxRaw * factor + offset;
+    if (fabsf(offset) > maxVal)
+        maxVal = fabsf(offset);
+
+    uint64_t maxValI = (uint64_t)maxVal;
+    int numDigits = 1;
+    while (maxValI >= 10) {
+        maxValI /= 10;
+        numDigits++;
+    }
+    if (offset < 0) {
+        numDigits++;    // allow space for negative sign
+    }
+
+    if (decimals) {
+        numDigits += decimals + 1;   // length for printf including decimal point
+    }
+
+    if (digitOrDecimal) {
+        return decimals;
+    }
+    else {
+        return numDigits;
+    }
 }

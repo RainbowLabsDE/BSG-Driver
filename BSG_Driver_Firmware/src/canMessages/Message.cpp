@@ -22,7 +22,7 @@ void Message::printSignals() {
     for (auto &sig : _signals) {
         const char *name = sig->_name;
         if (strcmp(name, "CRC") != 0 && strcmp(name, "SEQ") != 0) { // don't print CRC/SEQ
-            printf("%s: %5g, ", sig->_name, sig->getVal());
+            printf("%s: %*.*f%s, ", sig->_name, sig->_numDigits, sig->_numDecimals, sig->getVal(), sig->_unit ? sig->_unit : "");
         }
     }
     printf("\b \n");

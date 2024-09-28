@@ -22,14 +22,20 @@ void handleMsg(CAN_msg_t& msg) {
 }
 
 void initBSG() {
-    // TODO: send XCP
-    xcp.deactivateFBS4();
+    xcp.deactivateFBS4();   // TODO: clean up internally
 
     delay(10);
 
     canSender.m01F_Ctrl1.sMode.setRaw(M01F_Ctrl1::Mode::IDLE);
     canSender.m020_Ignition.sStatus.setRaw(M020_Ignition::Status::ON);
     canSender.m0B1_MotRPM.sStatus.setRaw(M0B1_MotRPM::Status::RUN);
+
+    canSender.m36F_Bat48VLim.sChgAMax.setVal(-50);
+    canSender.m36F_Bat48VLim.sDisChgAMax.setVal(50);
+    canSender.m36F_Bat48VLim.sChgVMax.setVal(54.0);
+    canSender.m36F_Bat48VLim.sDisChgVMin.setVal(40.0);
+    canSender.m443_Bat48VRes.sResChg.setVal(0.01);  // Ohm
+    canSender.m443_Bat48VRes.sResDis.setVal(0.01);  // Ohm
     
 }
 
@@ -123,13 +129,18 @@ void loop() {
 
         Serial.println();
         Serial.println(millis());
-        canSender.printRxMsgs();
-        printf("REQUEST: Mode: %5s, RPM: %4g, TRQ_min: %5.1f, TRQ_max: %5.1f\n", 
-            M01F_Ctrl1::ModeStr[canSender.m01F_Ctrl1.sMode.getRaw()], 
-            canSender.m01F_Ctrl1.sRpmReq.getVal(),
-            canSender.m01F_Ctrl1.sTrqMinRq.getVal(),
-            canSender.m01F_Ctrl1.sTrqMaxRq.getVal()
-            );
+        if (millis() - canSender.m01E_Status._lastSentTime > 500) {
+            printf("TIMEOUT!\n");
+        }
+        else {
+            canSender.printRxMsgs();
+            printf("REQUEST: Mode: %5s, RPM: %4g, TRQ_min: %5.1f, TRQ_max: %5.1f\n", 
+                M01F_Ctrl1::ModeStr[canSender.m01F_Ctrl1.sMode.getRaw()], 
+                canSender.m01F_Ctrl1.sRpmReq.getVal(),
+                canSender.m01F_Ctrl1.sTrqMinRq.getVal(),
+                canSender.m01F_Ctrl1.sTrqMaxRq.getVal()
+                );
+        }
     }
 
 }
