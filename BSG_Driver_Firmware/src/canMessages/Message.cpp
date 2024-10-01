@@ -1,5 +1,6 @@
 #include "Message.hpp"
 #include "../CanSender.hpp"
+#include "util.h"
 
 // hacky way to register Message, TODO: improve
 extern CanSender canSender;
@@ -22,7 +23,9 @@ void Message::printSignals() {
     for (auto &sig : _signals) {
         const char *name = sig->_name;
         if (strcmp(name, "CRC") != 0 && strcmp(name, "SEQ") != 0) { // don't print CRC/SEQ
-            printf("%s: %*.*f%s, ", sig->_name, sig->_numDigits, sig->_numDecimals, sig->getVal(), sig->_unit ? sig->_unit : "");
+            printf("%s: ", sig->_name);
+            printFloat(sig->getVal(), sig->_numDigits, sig->_numDecimals);
+            printf("%s, ", sig->_unit ? sig->_unit : "");
         }
     }
     printf("\b \n");

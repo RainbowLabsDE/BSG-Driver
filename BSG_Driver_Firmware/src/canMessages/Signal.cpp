@@ -52,10 +52,10 @@ void Signal::setVal(float val) {
 
 constexpr int Signal::calcNum(uint8_t length, float factor, float offset, bool digitOrDecimal) const {
     int decimals = 0;
-    if (factor < 0.01) {
+    if (factor < 0.01f) {
         decimals = 3;
     }
-    else if (factor < 0.1 || factor == 0.25) {
+    else if (factor < 0.1f || factor == 0.25f) {
         decimals = 2;
     }
     else if (factor < 1) {
@@ -63,8 +63,8 @@ constexpr int Signal::calcNum(uint8_t length, float factor, float offset, bool d
     }
     uint64_t maxRaw = (1ULL << length) - 1;
     float maxVal = maxRaw * factor + offset;
-    if (fabsf(offset) > maxVal)
-        maxVal = fabsf(offset);
+    if (std::abs(offset) > maxVal)
+        maxVal = std::abs(offset);
 
     uint64_t maxValI = (uint64_t)maxVal;
     int numDigits = 1;

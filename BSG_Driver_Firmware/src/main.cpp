@@ -22,10 +22,10 @@ void initBSG() {
 
     canSender.m36F_Bat48VLim.sChgAMax.setVal(-50);
     canSender.m36F_Bat48VLim.sDisChgAMax.setVal(50);
-    canSender.m36F_Bat48VLim.sChgVMax.setVal(54.0);
-    canSender.m36F_Bat48VLim.sDisChgVMin.setVal(40.0);
-    canSender.m443_Bat48VRes.sResChg.setVal(0.01);  // Ohm
-    canSender.m443_Bat48VRes.sResDis.setVal(0.01);  // Ohm
+    canSender.m36F_Bat48VLim.sChgVMax.setVal(54.0f);
+    canSender.m36F_Bat48VLim.sDisChgVMin.setVal(30.0f);
+    canSender.m443_Bat48VRes.sResChg.setVal(0.01f);  // Ohm
+    canSender.m443_Bat48VRes.sResDis.setVal(0.01f);  // Ohm
 }
 
 void setup() {
@@ -99,13 +99,13 @@ void loop() {
             case 'Q':   rpmRq += 20;        break;
             case 'a':   rpmRq -= 2;         break;
             case 'A':   rpmRq -= 20;        break;
-            case 'w':   trqMinRq += 0.5;    break;
+            case 'w':   trqMinRq += 0.5f;    break;
             case 'W':   trqMinRq += 5;      break;
-            case 's':   trqMinRq -= 0.5;    break;
+            case 's':   trqMinRq -= 0.5f;    break;
             case 'S':   trqMinRq -= 5;      break;
-            case 'e':   trqMaxRq += 0.5;    break;
+            case 'e':   trqMaxRq += 0.5f;    break;
             case 'E':   trqMaxRq += 5;      break;
-            case 'd':   trqMaxRq -= 0.5;    break;
+            case 'd':   trqMaxRq -= 0.5f;    break;
             case 'D':   trqMaxRq -= 5;      break;
             case 'y':   trqSyncRq += 1;     break;
             case 'x':   trqSyncRq -= 1;     break;
@@ -142,14 +142,17 @@ void loop() {
         }
         else {
             canSender.printRxMsgs();
-            printf("REQUEST: Mode: %5s, RPM: %4g, TRQ_min: %5.1f, TRQ_max: %5.1f, TRQ_sync: %4.0f\n", 
+            float rpm = canSender.m01F_Ctrl1.sRpmReq.getVal(), tMin = canSender.m01F_Ctrl1.sTrqMinRq.getVal(),
+                tMax = canSender.m01F_Ctrl1.sTrqMaxRq.getVal(), tSyn = canSender.m01F_Ctrl1.sTrqSyncRq.getVal();
+            printf("REQUEST: Mode: %5s, RPM: %4d, TRQ_min: %3d.%d, TRQ_max: %3d.%d, TRQ_sync: %3d.%d\n", 
                 M01F_Ctrl1::ModeStr[canSender.m01F_Ctrl1.sMode.getRaw()], 
-                canSender.m01F_Ctrl1.sRpmReq.getVal(),
-                canSender.m01F_Ctrl1.sTrqMinRq.getVal(),
-                canSender.m01F_Ctrl1.sTrqMaxRq.getVal(),
-                canSender.m01F_Ctrl1.sTrqSyncRq.getVal()
+                (int)rpm,
+                (int)tMin,  (int)(tMin * 10) % 10,
+                (int)tMax,  (int)(tMax * 10) % 10,
+                (int)tSyn,  (int)(tSyn * 10) % 10
                 );
         }
     }
 
 }
+
