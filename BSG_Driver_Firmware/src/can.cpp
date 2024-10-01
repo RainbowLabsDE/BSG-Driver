@@ -314,6 +314,24 @@ void CANSend(CAN_msg_t *CAN_tx_msg) {
     }
 }
 
+// Sends a simple CAN data message
+void CANSendSimple(uint32_t id, uint8_t *payload, uint8_t len, bool forceExtendedID) {
+    CAN_msg_t msg = {
+        .id = id,
+        .len = len,
+        .format = STANDARD_FORMAT,
+        .type = DATA_FRAME,
+    };
+
+    if (id >= 0x7FF || forceExtendedID) {
+        msg.format = EXTENDED_FORMAT;
+    }
+
+    memcpy(msg.data, payload, min(len, (uint8_t)sizeof(msg.data)));
+
+    CANSend(&msg);
+}
+
 /**
  * Returns whether there are CAN messages available.
  *

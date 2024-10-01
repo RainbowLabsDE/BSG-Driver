@@ -13,7 +13,7 @@ class M01E_Status : public Message {
     Signal sRPM = Signal(this, "RPM", 16, 14, 1.0, 0.0, 16383);                 // RPM
     Signal sTrq = Signal(this, "Trq", 48, 13, 0.25, -500, 1547.5, "Nm");        // Measured torque
     Signal sVolt = Signal(this, "DC_V", 32, 14, 0.1, 0.0, 1638.3, "V");         // Voltage of DC input
-    Signal sDAC = Signal(this, "FBS4_actv", 46, 2);                             // FBS4 DAC active
+    Signal sFBS4 = Signal(this, "FBS4_actv", 46, 2);                            // FBS4 DAC active
     Signal sDir = Signal(this, "Dir", 30, 1);                                   // Direction, 0=CW, 1=CCW (viewed from front), but doesn't actually work
 
     const uint8_t* dataIdList() { return _crcDataIdList; }

@@ -11,21 +11,11 @@ bool started = false;
 
 // TODO: move somewhere better
 void handleMsg(CAN_msg_t& msg) {
-    switch (msg.id) {
-        case CAN_ID_XCP_RESP:
-            // TODO
-            break;
-        default:
-            bool knownMsg = canSender.handleMsg(msg);
-            break;
-    }
+    xcp.handleMsg(msg);
+    bool knownMsg = canSender.handleMsg(msg);
 }
 
 void initBSG() {
-    xcp.deactivateFBS4();   // TODO: clean up internally
-
-    delay(10);
-
     canSender.m01F_Ctrl1.sMode.setRaw(M01F_Ctrl1::Mode::IDLE);
     canSender.m020_Ignition.sStatus.setRaw(M020_Ignition::Status::ON);
     canSender.m0B1_MotRPM.sStatus.setRaw(M0B1_MotRPM::Status::RUN);
@@ -36,7 +26,6 @@ void initBSG() {
     canSender.m36F_Bat48VLim.sDisChgVMin.setVal(40.0);
     canSender.m443_Bat48VRes.sResChg.setVal(0.01);  // Ohm
     canSender.m443_Bat48VRes.sResDis.setVal(0.01);  // Ohm
-    
 }
 
 void setup() {
@@ -49,7 +38,7 @@ void setup() {
     
     delay(1000);
 
-   
+    initBSG();
 }
 
 uint8_t counter = 0;
@@ -61,11 +50,12 @@ const long interval = 1000;       // transmission interval (milliseconds)
 uint32_t prevDebug = 0;
 
 int rpmRq = 0;
-float trqMinRq = 0, trqMaxRq = 0;
+float trqMinRq = 0, trqMaxRq = 0, trqSyncRq = 0;
+uint32_t _lastFBS4Unlock = 0;
 
 void loop() {
-    if (!started && millis() > 3000) {
-        initBSG();
+    if (!started && millis() > 1000) {
+        xcp.deactivateFBS4();
         started = true;
     }
 
@@ -75,6 +65,20 @@ void loop() {
         CAN_msg_t msg = {0};
         CANReceive(&msg);
         handleMsg(msg);
+    }
+
+    xcp.loop();
+
+    // Redo FBS4 unlocking if it's locked for 3s (also retry every 3s)
+    if (millis() - canSender.m01E_Status._lastSentTime < 100) { // BSG active and sending
+        if (canSender.m01E_Status.sFBS4.getRaw() == 0) {    // reset timeout if status == ok
+            _lastFBS4Unlock = millis();
+        }
+        else if (millis() - _lastFBS4Unlock > 3000) {       // unlock after timeout
+            _lastFBS4Unlock = millis();
+            xcp.deactivateFBS4();
+        }
+
     }
 
     while (Serial.available()) {
@@ -103,12 +107,15 @@ void loop() {
             case 'E':   trqMaxRq += 5;      break;
             case 'd':   trqMaxRq -= 0.5;    break;
             case 'D':   trqMaxRq -= 5;      break;
+            case 'y':   trqSyncRq += 1;     break;
+            case 'x':   trqSyncRq -= 1;     break;
             case ' ':
             case '\n':
             case '\r':
                 rpmRq = 0;
                 trqMinRq = 0;
                 trqMaxRq = 0;
+                trqSyncRq = 0;
                 canSender.m01F_Ctrl1.sMode.setRaw(M01F_Ctrl1::Mode::IDLE);
             break;
         }
@@ -121,9 +128,10 @@ void loop() {
 
         canSender.m01F_Ctrl1.sTrqMinRq.setVal(trqMinRq);
         canSender.m01F_Ctrl1.sTrqMaxRq.setVal(trqMaxRq);
+        canSender.m01F_Ctrl1.sTrqSyncRq.setVal(trqSyncRq);
     }
 
-    if (millis() - prevDebug >= 500) {
+    if (millis() - prevDebug >= 200) {
         prevDebug = millis();
         digitalWrite(PC13, !digitalRead(PC13));
 
@@ -134,11 +142,12 @@ void loop() {
         }
         else {
             canSender.printRxMsgs();
-            printf("REQUEST: Mode: %5s, RPM: %4g, TRQ_min: %5.1f, TRQ_max: %5.1f\n", 
+            printf("REQUEST: Mode: %5s, RPM: %4g, TRQ_min: %5.1f, TRQ_max: %5.1f, TRQ_sync: %4.0f\n", 
                 M01F_Ctrl1::ModeStr[canSender.m01F_Ctrl1.sMode.getRaw()], 
                 canSender.m01F_Ctrl1.sRpmReq.getVal(),
                 canSender.m01F_Ctrl1.sTrqMinRq.getVal(),
-                canSender.m01F_Ctrl1.sTrqMaxRq.getVal()
+                canSender.m01F_Ctrl1.sTrqMaxRq.getVal(),
+                canSender.m01F_Ctrl1.sTrqSyncRq.getVal()
                 );
         }
     }

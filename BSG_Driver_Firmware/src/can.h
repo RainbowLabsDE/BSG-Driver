@@ -31,4 +31,5 @@ typedef const struct {
 bool CANInit(BITRATE bitrate, int remap);
 void CANReceive(CAN_msg_t *CAN_rx_msg);
 void CANSend(CAN_msg_t *CAN_tx_msg);
+void CANSendSimple(uint32_t id, uint8_t *payload, uint8_t len, bool forceExtendedID = false);
 uint8_t CANMsgAvail(void);
