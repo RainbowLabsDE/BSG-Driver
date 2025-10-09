@@ -13,9 +13,18 @@ class XCP {
     const int RETRY_DELAY = 250;
 
     static inline constexpr uint8_t positiveUDSResponse[] = {0x06, 0x50, 0x03, 0x00};
-    const uint32_t XCP_ADDR_FW_VER = 0x00014000;                        // Address of firmware version
-    static inline constexpr uint8_t validFWVersion[] = {18, 20, 2};     // Expected firmware version number, patch probably only works with this version (Year, Week, Patch)
-    const uint32_t XCP_ADDR_FBS4_PATCH = 0x4000ecd6;                    // Address of FBS4 "personalized & activated" flag in memory
+
+
+    typedef struct {
+        uint8_t fwVer[3];       // Expected firmware version number, patch only works with this version (Year, Week, Patch)
+        uint32_t patchAddr;     // Address of FBS4 "personalized & activated" flag in memory
+    } xcpPatchAddr_t;
+
+    static inline constexpr xcpPatchAddr_t XCP_FBS4_PATCH_ADDR[] = {
+        {{18, 20, 2}, 0x4000ecd6},  // Firmware version found in A2649001000
+        {{21, 16, 1}, 0x4000eeea},  // Firmware version found in A2649001700
+    };
+    const uint32_t XCP_ADDR_FW_VER = 0x00014000;    // Address of firmware version in flash
 
 
     public:
@@ -112,7 +121,7 @@ class XCP {
                     if (memcmp(_rxMsg.data, positiveUDSResponse, sizeof(positiveUDSResponse)) == 0) {   // is positive response
                         _state = State::Connect;
                         // stepSuccessful = true;   //?
-                        _retries = 0;
+                        _retries = 0;               // mark current step successful by resetting retry counter
                     }
                 }
             }
@@ -130,11 +139,20 @@ class XCP {
                         break;
                     case State::UL_FWVer:
                         if (_rxMsg.data[0] == (uint8_t)PID::RES) {  // successful XCP response
-                            if (memcmp(_rxMsg.data + 1, validFWVersion, sizeof(validFWVersion)) == 0) {
-                                _state = State::DL_setAddr;
-                                _retries = 0;
+                            uint8_t *readFwVersion = _rxMsg.data + 1;
+                            _addrToPatch = UINT32_MAX;  // reset to invalid 
+
+                            // Find matching firmware version
+                            for (auto fwPatchAddr : XCP_FBS4_PATCH_ADDR) {
+                                if (memcmp(readFwVersion, fwPatchAddr.fwVer, sizeof(xcpPatchAddr_t::fwVer)) == 0) {
+                                    _addrToPatch = fwPatchAddr.patchAddr;
+                                    _state = State::DL_setAddr;
+                                    _retries = 0;       // mark current step successful by resetting retry counter
+                                    break;
+                                }
                             }
-                            else {
+
+                            if (_addrToPatch == UINT32_MAX) {   // No matching firmware version found
                                 printf("ERROR: possible incompatible firmware version detected (%02d.%02d.%02d), aborting FBS4 patch. \nPlease open an issue with firmware dump, so compatibility can be checked.\n", 
                                     _rxMsg.data[1], _rxMsg.data[2], _rxMsg.data[3]);
                                 _state = State::Error;
@@ -169,7 +187,7 @@ class XCP {
                     upload(3);
                     break;
                 case State::DL_setAddr:
-                    set_mta(XCP_ADDR_FBS4_PATCH);
+                    set_mta(_addrToPatch);
                     break;
                 case State::DL_FBS4Patch: {
                     uint8_t payload = 1;
@@ -221,6 +239,7 @@ class XCP {
     int _retries = 0;
     CAN_msg_t _rxMsg;
     bool _newMsg;
+    uint32_t _addrToPatch = UINT32_MAX;
 };
 
 inline XCP xcp;
