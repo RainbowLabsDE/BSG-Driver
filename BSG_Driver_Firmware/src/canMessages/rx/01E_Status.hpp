@@ -15,6 +15,7 @@ class M01E_Status : public Message {
     Signal sVolt = Signal(this, "DC_V", 32, 14, 0.1, 0.0, 1638.3, "V");         // Voltage of DC input
     Signal sFBS4 = Signal(this, "FBS4_actv", 46, 2);                            // FBS4 DAC active
     Signal sDir = Signal(this, "Dir", 30, 1);                                   // Direction, 0=CW, 1=CCW (viewed from front), but doesn't actually work
+    Signal sLimit = Signal(this, "Limit", 61, 3);
 
     const uint8_t* dataIdList() { return _crcDataIdList; }
     static inline constexpr const uint8_t _crcDataIdList[16] = { 38, 180, 71, 213, 104, 246, 137, 28, 170, 61, 203, 94, 236, 127, 18, 160 };

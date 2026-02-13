@@ -12,10 +12,31 @@ class M047_Status3 : public Message {
     Signal sReady = Signal(this, "Rdy", 14, 2);                                     // 1: not ready, 2: ready
     Signal sDCCur = Signal(this, "A_DC", 0, 14, 0.1, -819.2, 819.1, "A");           // DC Current
     Signal sPhaseCur = Signal(this, "A_Phase", 40, 13, 0.1, 0.0, 819.1, "A");       // Phase current
-    Signal sUnkTrq = Signal(this, "Some torque?", 54, 10, 1.0, -1022, 0, "Nm");
+    Signal sLimitActive = Signal(this, "LimitActive", 16, 2);                       // Limit state
+    Signal sLimitReason = Signal(this, "LimitReason", 36, 4);                       // Limit reason
+    // Signal sUnkTrq = Signal(this, "Some torque?", 54, 10, 1.0, -1022, 0, "Nm");
 
     enum Ready {
         NOT_READY = 1,
         READY = 2,
+    };
+
+    enum LimitActive {
+        INACTIVE,
+        LIM_CHG,
+        LIM_DSCHG,
+    };
+
+    enum LimitReason {
+        INACTIVE,
+        VOLT_DC,
+        CURR_DC,
+        TRQ,
+        SPD,
+        INV,
+        TEMP,
+        L2,     // ?
+        PWR_,
+        CURR_PH,
     };
 };

@@ -8,6 +8,8 @@
 CanSender canSender(CANSend);
 bool started = false;
 
+int rpmRq = 0;
+float trqMinRq = 0, trqMaxRq = 0, trqSyncRq = 0;
 
 // TODO: move somewhere better
 void handleMsg(CAN_msg_t& msg) {
@@ -20,12 +22,20 @@ void initBSG() {
     canSender.m020_Ignition.sStatus.setRaw(M020_Ignition::Status::ON);
     canSender.m0B1_MotRPM.sStatus.setRaw(M0B1_MotRPM::Status::RUN);
 
-    canSender.m36F_Bat48VLim.sChgAMax.setVal(-50);
+    canSender.m36F_Bat48VLim.sChgAMax.setVal(-10);
     canSender.m36F_Bat48VLim.sDisChgAMax.setVal(50);
     canSender.m36F_Bat48VLim.sChgVMax.setVal(54.0f);
-    canSender.m36F_Bat48VLim.sDisChgVMin.setVal(30.0f);
+    canSender.m36F_Bat48VLim.sDisChgVMin.setVal(44.0f);
     canSender.m443_Bat48VRes.sResChg.setVal(0.01f);  // Ohm
     canSender.m443_Bat48VRes.sResDis.setVal(0.01f);  // Ohm
+
+    // // do something on startup (for MakerFaire)
+    // trqMaxRq = 2;
+    // rpmRq = 10;
+    // canSender.m01F_Ctrl1.sTrqMaxRq.setVal(trqMaxRq);
+    // canSender.m01F_Ctrl1.sRpmReq.setVal(rpmRq); 
+    // canSender.m01F_Ctrl1.sMode.setRaw(M01F_Ctrl1::Mode::RPM);
+
 }
 
 void setup() {
@@ -49,8 +59,6 @@ const long interval = 1000;       // transmission interval (milliseconds)
 
 uint32_t prevDebug = 0;
 
-int rpmRq = 0;
-float trqMinRq = 0, trqMaxRq = 0, trqSyncRq = 0;
 uint32_t _lastFBS4Unlock = 0;
 
 void loop() {
@@ -131,7 +139,7 @@ void loop() {
         canSender.m01F_Ctrl1.sTrqSyncRq.setVal(trqSyncRq);
     }
 
-    if (millis() - prevDebug >= 200) {
+    if (millis() - prevDebug >= 100) {
         prevDebug = millis();
         digitalWrite(PC13, !digitalRead(PC13));
 
@@ -142,15 +150,17 @@ void loop() {
         }
         else {
             canSender.printRxMsgs();
+            printf("REQUEST:\n");
+            canSender.m01F_Ctrl1.printSignals();
             float rpm = canSender.m01F_Ctrl1.sRpmReq.getVal(), tMin = canSender.m01F_Ctrl1.sTrqMinRq.getVal(),
                 tMax = canSender.m01F_Ctrl1.sTrqMaxRq.getVal(), tSyn = canSender.m01F_Ctrl1.sTrqSyncRq.getVal();
-            printf("REQUEST: Mode: %5s, RPM: %4d, TRQ_min: %3d.%d, TRQ_max: %3d.%d, TRQ_sync: %3d.%d\n", 
-                M01F_Ctrl1::ModeStr[canSender.m01F_Ctrl1.sMode.getRaw()], 
-                (int)rpm,
-                (int)tMin,  (int)(tMin * 10) % 10,
-                (int)tMax,  (int)(tMax * 10) % 10,
-                (int)tSyn,  (int)(tSyn * 10) % 10
-                );
+            // printf("Mode: %5s, RPM: %4d, TRQ_min: %3d.%d, TRQ_max: %3d.%d, TRQ_sync: %3d.%d\n", 
+            //     M01F_Ctrl1::ModeStr[canSender.m01F_Ctrl1.sMode.getRaw()], 
+            //     (int)rpm,
+            //     (int)tMin,  (int)(tMin * 10) % 10,
+            //     (int)tMax,  (int)(tMax * 10) % 10,
+            //     (int)tSyn,  (int)(tSyn * 10) % 10
+            //     );
         }
     }
 

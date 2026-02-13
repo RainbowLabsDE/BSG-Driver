@@ -11,7 +11,7 @@ class M371_Bat48VPwr : public Message {
     SigCRC sCRC = SigCRC(this);
     SigSEQ sSEQ = SigSEQ(this);
     Signal sMaxDisChgP = Signal(this, "Max. Discharge Power", 12, 14, 20, 0, 20e3, "W");
-    Signal sChgV = Signal(this, "Charge Voltage", 26, 16, 0.02, 0, 50.4, "V");
+    Signal sChgV = Signal(this, "Charge Voltage", 26, 16, 0.02, 0, 50.4, "V");              // limit according to firmware: 30-52 (if I understood it correctly)
     Signal sMaxChgP = Signal(this, "Max. Charge Power", 42, 14, 20, 0, 20e3, "W");
 
     const uint8_t* dataIdList() { return _crcDataIdList; }
