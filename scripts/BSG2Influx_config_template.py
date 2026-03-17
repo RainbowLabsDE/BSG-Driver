@@ -1,3 +1,5 @@
+# Rename to "BSG2Influx_config.py"
+
 # ==============================
 # SERIAL CONFIGURATION
 # ==============================

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Message.hpp"
-#include "E2E_CRC.hpp"
+#include "../Message.hpp"
+#include "../E2E_CRC.hpp"
 
 class M306_48VSwitch : public Message {
     public:

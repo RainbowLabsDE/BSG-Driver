@@ -17,6 +17,7 @@ Message::Message(uint32_t id, uint8_t dataLength, int intervalTime, bool hasCrc,
     }
 }
 
+// Dumps all signals of this message via printf
 void Message::printSignals() {
     printf("[%03X] ", this->_id);
 

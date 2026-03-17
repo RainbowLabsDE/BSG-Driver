@@ -1,3 +1,5 @@
+// Implments the Autosar E2E Profile 2 CAN message structure and CRC calculation
+
 #pragma once 
 
 #include <stdint.h>

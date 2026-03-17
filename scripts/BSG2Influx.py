@@ -1,4 +1,4 @@
-# mostly LLM generated, modified to actually work
+# Disclaimer: mostly LLM generated, modified to actually work
 # pip install pyserial influxdb-client
 
 import serial

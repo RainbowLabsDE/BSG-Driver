@@ -4,29 +4,29 @@
 #include <vector>
 
 #include "can.h"
-#include "canMessages/01F_Ctrl1.hpp"
-#include "canMessages/020_Ign.hpp"
-#include "canMessages/025_Ctrl2.hpp"
-#include "canMessages/081_MotorFoo.hpp"
-#include "canMessages/099_Power.hpp"
-#include "canMessages/0AE_Transmission.hpp"
-#include "canMessages/0AF_Transmission2.hpp"
-#include "canMessages/0B1_MotRPM.hpp"
-#include "canMessages/0B9_MotSuppr.hpp"
-#include "canMessages/145_MotEM.hpp"
-#include "canMessages/170_OBD1.hpp"
-#include "canMessages/173_OBD4.hpp"
-#include "canMessages/2AF_Coolant.hpp"
-#include "canMessages/2D3_Bat12V.hpp"
-#include "canMessages/306_48VSwitch.hpp"
-#include "canMessages/309_Info.hpp"
-#include "canMessages/35A_Bat48V.hpp"
-#include "canMessages/36F_Bat48VLim.hpp"
-#include "canMessages/371_Bat48VPwr.hpp"
-#include "canMessages/3CC_LowCool1.hpp"
-#include "canMessages/3F2_LowCool2.hpp"
-#include "canMessages/443_Bat48VRes.hpp"
-#include "canMessages/4C0_Timeouts.hpp"
+#include "canMessages/tx/01F_Ctrl1.hpp"
+#include "canMessages/tx/020_Ign.hpp"
+#include "canMessages/tx/025_Ctrl2.hpp"
+#include "canMessages/tx/081_MotorFoo.hpp"
+#include "canMessages/tx/099_Power.hpp"
+#include "canMessages/tx/0AE_Transmission.hpp"
+#include "canMessages/tx/0AF_Transmission2.hpp"
+#include "canMessages/tx/0B1_MotRPM.hpp"
+#include "canMessages/tx/0B9_MotSuppr.hpp"
+#include "canMessages/tx/145_MotEM.hpp"
+#include "canMessages/tx/170_OBD1.hpp"
+#include "canMessages/tx/173_OBD4.hpp"
+#include "canMessages/tx/2AF_Coolant.hpp"
+#include "canMessages/tx/2D3_Bat12V.hpp"
+#include "canMessages/tx/306_48VSwitch.hpp"
+#include "canMessages/tx/309_Info.hpp"
+#include "canMessages/tx/35A_Bat48V.hpp"
+#include "canMessages/tx/36F_Bat48VLim.hpp"
+#include "canMessages/tx/371_Bat48VPwr.hpp"
+#include "canMessages/tx/3CC_LowCool1.hpp"
+#include "canMessages/tx/3F2_LowCool2.hpp"
+#include "canMessages/tx/443_Bat48VRes.hpp"
+#include "canMessages/tx/4C0_Timeouts.hpp"
 #include "canMessages/rx/01E_Status.hpp"
 #include "canMessages/rx/047_Status3.hpp"
 #include "canMessages/rx/190_Status2.hpp"
@@ -92,7 +92,7 @@ class CanSender {
         _rxMessages.push_back(msg);
     }
 
-    std::vector<Message*> _messages;    // Messages should register themselves
+    std::vector<Message*> _messages;    // Messages will register themselves to the CanSender
     std::vector<Message*> _rxMessages;
     void (*_canTx)(CAN_msg_t*);
 

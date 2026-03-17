@@ -22,7 +22,7 @@ class M047_Status3 : public Message {
     };
 
     enum LimitActive {
-        INACTIVE,
+        NOLIM,
         LIM_CHG,
         LIM_DSCHG,
     };
@@ -35,7 +35,7 @@ class M047_Status3 : public Message {
         SPD,
         INV,
         TEMP,
-        L2,     // ?
+        R_UNKNOWN,
         PWR_,
         CURR_PH,
     };

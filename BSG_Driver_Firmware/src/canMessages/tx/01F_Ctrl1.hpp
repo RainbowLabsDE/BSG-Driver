@@ -1,10 +1,11 @@
 #pragma once
 
-#include "Message.hpp"
-#include "E2E_CRC.hpp"
+#include "../Message.hpp"
+#include "../E2E_CRC.hpp"
 
 class M01F_Ctrl1 : public Message {
     public:
+    // Try implementing a new Signal type in-place, but didn't work as I wanted
     // class Mode : public Signal {
     //   public:
     //     Mode(Message* msg) : Signal(msg, "Mode", 12, 4) {}
@@ -21,9 +22,9 @@ class M01F_Ctrl1 : public Message {
     SigSEQ sSEQ = SigSEQ(this);
     // Mode sMode = Mode(this);
     Signal sMode = Signal(this, "Mode", 12, 4);
-    Signal sRpmReq = Signal(this, "RPM_Req", 16, 12, 2.0);  // RPM means "engine RPM", so BSG spins about 3x as fast (belt ratio)
+    Signal sRpmReq = Signal(this, "RPM_Req", 16, 12, 2.0);                          // RPM means "engine RPM", so BSG spins about 3x as fast (belt ratio)
     Signal sUnk4 = Signal(this, 28, 4, 1);
-    Signal sTrqMinRq = Signal(this, "MinTrq_Req", 32, 11, 0.5, -512, 0.0, "Nm");
+    Signal sTrqMinRq = Signal(this, "MinTrq_Req", 32, 11, 0.5, -512, 0.0, "Nm");    // Torque means "enigne Torque", so BSG actually does 1/3 of the requested torque 
     Signal sTrqMaxRq = Signal(this, "MaxTrq_Req", 45, 11, 0.5, -512, 0.0, "Nm");
     Signal sTrqSyncRq = Signal(this, "SyncTrq_Req", 56, 8, 1.0, -112, 0.0, "Nm");   // ?
 

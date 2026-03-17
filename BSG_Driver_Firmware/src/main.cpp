@@ -5,29 +5,24 @@
 #include "CanSender.hpp"
 #include "xcp.hpp"
 
+// initialize class that handles the periodic sending of the required control messages
 CanSender canSender(CANSend);
 bool started = false;
 
 int rpmRq = 0;
 float trqMinRq = 0, trqMaxRq = 0, trqSyncRq = 0;
 
-// TODO: move somewhere better
-void handleMsg(CAN_msg_t& msg) {
-    xcp.handleMsg(msg);
-    bool knownMsg = canSender.handleMsg(msg);
-}
-
 void initBSG() {
     canSender.m01F_Ctrl1.sMode.setRaw(M01F_Ctrl1::Mode::IDLE);
     canSender.m020_Ignition.sStatus.setRaw(M020_Ignition::Status::ON);
     canSender.m0B1_MotRPM.sStatus.setRaw(M0B1_MotRPM::Status::RUN);
 
-    canSender.m36F_Bat48VLim.sChgAMax.setVal(-10);
-    canSender.m36F_Bat48VLim.sDisChgAMax.setVal(50);
-    canSender.m36F_Bat48VLim.sChgVMax.setVal(54.0f);
-    canSender.m36F_Bat48VLim.sDisChgVMin.setVal(44.0f);
-    canSender.m443_Bat48VRes.sResChg.setVal(0.01f);  // Ohm
-    canSender.m443_Bat48VRes.sResDis.setVal(0.01f);  // Ohm
+    canSender.m36F_Bat48VLim.sChgAMax.setVal(-260);
+    canSender.m36F_Bat48VLim.sDisChgAMax.setVal(350);
+    canSender.m36F_Bat48VLim.sChgVMax.setVal(54.0);
+    canSender.m36F_Bat48VLim.sDisChgVMin.setVal(24.0);
+    canSender.m443_Bat48VRes.sResChg.setVal(0.01);  // Ohm
+    canSender.m443_Bat48VRes.sResDis.setVal(0.01);  // Ohm
 
     // // do something on startup (for MakerFaire)
     // trqMaxRq = 2;
@@ -35,13 +30,12 @@ void initBSG() {
     // canSender.m01F_Ctrl1.sTrqMaxRq.setVal(trqMaxRq);
     // canSender.m01F_Ctrl1.sRpmReq.setVal(rpmRq); 
     // canSender.m01F_Ctrl1.sMode.setRaw(M01F_Ctrl1::Mode::RPM);
-
 }
 
 void setup() {
     Serial.begin(115200);
     pinMode(PC13, OUTPUT);
-    bool ret = CANInit(CAN_500KBPS, 2); // CAN_RX mapped to PB8, CAN_TX mapped to PB9
+    bool ret = CANInit(CAN_500KBPS, 2); // Remap 2: CAN_RX mapped to PB8, CAN_TX mapped to PB9
     if (!ret)
         while (true)
             ;
@@ -55,7 +49,6 @@ uint8_t counter = 0;
 uint8_t frameLength = 0;
 unsigned long previousMillis = 0; // stores last time output was updated
 const long interval = 1000;       // transmission interval (milliseconds)
-
 
 uint32_t prevDebug = 0;
 
@@ -72,7 +65,9 @@ void loop() {
     if (CANMsgAvail()) {
         CAN_msg_t msg = {0};
         CANReceive(&msg);
-        handleMsg(msg);
+
+        xcp.handleMsg(msg);
+        bool knownMsg = canSender.handleMsg(msg);
     }
 
     xcp.loop();
@@ -107,13 +102,13 @@ void loop() {
             case 'Q':   rpmRq += 20;        break;
             case 'a':   rpmRq -= 2;         break;
             case 'A':   rpmRq -= 20;        break;
-            case 'w':   trqMinRq += 0.5f;    break;
+            case 'w':   trqMinRq += 0.5;    break;
             case 'W':   trqMinRq += 5;      break;
-            case 's':   trqMinRq -= 0.5f;    break;
+            case 's':   trqMinRq -= 0.5;    break;
             case 'S':   trqMinRq -= 5;      break;
-            case 'e':   trqMaxRq += 0.5f;    break;
+            case 'e':   trqMaxRq += 0.5;    break;
             case 'E':   trqMaxRq += 5;      break;
-            case 'd':   trqMaxRq -= 0.5f;    break;
+            case 'd':   trqMaxRq -= 0.5;    break;
             case 'D':   trqMaxRq -= 5;      break;
             case 'y':   trqSyncRq += 1;     break;
             case 'x':   trqSyncRq -= 1;     break;
@@ -152,17 +147,7 @@ void loop() {
             canSender.printRxMsgs();
             printf("REQUEST:\n");
             canSender.m01F_Ctrl1.printSignals();
-            float rpm = canSender.m01F_Ctrl1.sRpmReq.getVal(), tMin = canSender.m01F_Ctrl1.sTrqMinRq.getVal(),
-                tMax = canSender.m01F_Ctrl1.sTrqMaxRq.getVal(), tSyn = canSender.m01F_Ctrl1.sTrqSyncRq.getVal();
-            // printf("Mode: %5s, RPM: %4d, TRQ_min: %3d.%d, TRQ_max: %3d.%d, TRQ_sync: %3d.%d\n", 
-            //     M01F_Ctrl1::ModeStr[canSender.m01F_Ctrl1.sMode.getRaw()], 
-            //     (int)rpm,
-            //     (int)tMin,  (int)(tMin * 10) % 10,
-            //     (int)tMax,  (int)(tMax * 10) % 10,
-            //     (int)tSyn,  (int)(tSyn * 10) % 10
-            //     );
         }
     }
-
 }
 

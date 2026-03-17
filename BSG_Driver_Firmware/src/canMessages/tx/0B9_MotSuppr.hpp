@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Message.hpp"
-#include "E2E_CRC.hpp"
+#include "../Message.hpp"
+#include "../E2E_CRC.hpp"
 
 class M0B9_MotSuppr : public Message {
     public:
