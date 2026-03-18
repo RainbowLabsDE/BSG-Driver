@@ -10,11 +10,11 @@ class M01E_Status : public Message {
     // Signals automatically register themselves in the "_signals" vector.
     SigCRC sCRC = SigCRC(this);
     SigSEQ sSEQ = SigSEQ(this);
-    Signal sRPM = Signal(this, "RPM", 16, 14, 1.0, 0.0, 16383);                 // RPM
-    Signal sTrq = Signal(this, "Trq", 48, 13, 0.25, -500, 1547.5, "Nm");        // Measured torque
-    Signal sVolt = Signal(this, "DC_V", 32, 14, 0.1, 0.0, 1638.3, "V");         // Voltage of DC input
-    Signal sFBS4 = Signal(this, "FBS4_actv", 46, 2);                            // FBS4 DAC active
-    Signal sDir = Signal(this, "Dir", 30, 1);                                   // Direction, 0=CW, 1=CCW (viewed from front), but doesn't actually work
+    Signal sRPM = Signal(this, "RPM", 16, 14, 3.0, 0.0, 16383);                     // RPM (as seen from BSG, so *3 compared to engine)
+    Signal sTrq = Signal(this, "Trq", 48, 13, 0.25/3.0, -500.0/3.0, 1547.5, "Nm");  // Measured torque (as seen from BSG, so /3)
+    Signal sVolt = Signal(this, "DC_V", 32, 14, 0.1, 0.0, 1638.3, "V");             // Voltage of DC input
+    Signal sFBS4 = Signal(this, "FBS4_actv", 46, 2);                                // FBS4 DAS active
+    Signal sDir = Signal(this, "Dir", 30, 1);                                       // Direction, 0=CW, 1=CCW (viewed from front), but doesn't actually work
     Signal sLimit = Signal(this, "Limit", 61, 3);
 
     const uint8_t* dataIdList() { return _crcDataIdList; }

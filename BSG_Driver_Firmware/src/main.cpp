@@ -98,20 +98,20 @@ void loop() {
             case 'r':
                 canSender.m01F_Ctrl1.sMode.setRaw(M01F_Ctrl1::Mode::RPM);
                 break;
-            case 'q':   rpmRq += 2;         break;
-            case 'Q':   rpmRq += 20;        break;
-            case 'a':   rpmRq -= 2;         break;
-            case 'A':   rpmRq -= 20;        break;
-            case 'w':   trqMinRq += 0.5;    break;
-            case 'W':   trqMinRq += 5;      break;
-            case 's':   trqMinRq -= 0.5;    break;
-            case 'S':   trqMinRq -= 5;      break;
-            case 'e':   trqMaxRq += 0.5;    break;
-            case 'E':   trqMaxRq += 5;      break;
-            case 'd':   trqMaxRq -= 0.5;    break;
-            case 'D':   trqMaxRq -= 5;      break;
-            case 'y':   trqSyncRq += 1;     break;
-            case 'x':   trqSyncRq -= 1;     break;
+            case 'q':   rpmRq += 6;         break;
+            case 'Q':   rpmRq += 60;        break;
+            case 'a':   rpmRq -= 6;         break;
+            case 'A':   rpmRq -= 60;        break;
+            case 'w':   trqMinRq += 1/6.0;  break;
+            case 'W':   trqMinRq += 2.0;    break;
+            case 's':   trqMinRq -= 1/6.0;  break;
+            case 'S':   trqMinRq -= 2.0;    break;
+            case 'e':   trqMaxRq += 1/6.0;  break;
+            case 'E':   trqMaxRq += 2.0;    break;
+            case 'd':   trqMaxRq -= 1/6.0;  break;
+            case 'D':   trqMaxRq -= 2.0;    break;
+            case 'y':   trqSyncRq += 1/3.0; break;
+            case 'x':   trqSyncRq -= 1/3.0; break;
             case ' ':
             case '\n':
             case '\r':

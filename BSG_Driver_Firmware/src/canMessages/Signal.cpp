@@ -55,7 +55,7 @@ constexpr int Signal::calcNum(uint8_t length, float factor, float offset, bool d
     if (factor < 0.01f) {
         decimals = 3;
     }
-    else if (factor < 0.1f || factor == 0.25f) {
+    else if (factor < 0.34f && factor != 0.1) {    // hacky way to account for 0.25 and 0.16666 / 0.33333
         decimals = 2;
     }
     else if (factor < 1) {

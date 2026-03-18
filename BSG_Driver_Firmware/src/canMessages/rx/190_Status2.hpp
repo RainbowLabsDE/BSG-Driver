@@ -10,10 +10,10 @@ class M190_Status2 : public Message {
     // Signals automatically register themselves in the "_signals" vector.
     SigCRC sCRC = SigCRC(this);
     SigSEQ sSEQ = SigSEQ(this);
-    Signal sState = Signal(this, "State", 29, 3);                                           // Current BSG state?
-    Signal sPossTrqMin = Signal(this, "PossTrq_Min", 48, 13, 0.25, -1024, 1023.75, "Nm");   // Minimum possible torque
-    Signal sPossTrqMax = Signal(this, "PossTrq_Max", 16, 13, 0.25, -1024, 1023.75, "Nm");   // Maximum possible torque
-    Signal sCurNegTrq = Signal(this, "CurNegTrq", 32, 13, 0.25, -500, 1547.75, "Nm");       // Current negative torque
+    Signal sState = Signal(this, "State", 29, 3);                                                       // Current BSG state
+    Signal sPossTrqMin = Signal(this, "PossTrq_Min", 48, 13, 0.25/3.0, -1024.0/3.0, 1023.75/3.0, "Nm"); // Minimum possible torque (As seen from the BSG)
+    Signal sPossTrqMax = Signal(this, "PossTrq_Max", 16, 13, 0.25/3.0, -1024.0/3.0, 1023.75/3.0, "Nm"); // Maximum possible torque
+    Signal sCurNegTrq = Signal(this, "CurNegTrq", 32, 13, 0.25/3.0, -500.0/3.0, 1547.75/3.0, "Nm");     // Current negative torque
     Signal sUnkErr = Signal(this, "SomeErr", 45, 2);
     Signal sUnk = Signal(this, "Unk", 47, 1);
 
