@@ -27,6 +27,8 @@ You can find a 3D scan of the starter generator in the [mechanical](/mechanical/
 ### Connector Pinout
 The CAN connector is a `TE MCON 1.2`, 2-row, 6 position.  
 
+Connector: TE 1-2287965-5 , Pins 7-1452671-3
+
 Pinout when viewed from the front:
 
 ```
